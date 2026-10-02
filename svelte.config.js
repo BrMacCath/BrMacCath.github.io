@@ -1,15 +1,22 @@
 import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { mdsvex } from 'mdsvex';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-const dev = process.argv.includes('dev');
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export default {
-  extensions: ['.svelte', '.svx', '.md'],
-  preprocess: [mdsvex({ extensions: ['.svx', '.md'] })],
-  kit: {
-    adapter: adapter({ fallback: '404.html' }),
-    paths: {
-      base: dev ? '' : '/YOUR-REPO-NAME'   // not needed if repo is username.github.io
-    }
-  }
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	extensions: ['.svelte', '.svx', '.md'],
+	preprocess: [vitePreprocess(), mdsvex({ extensions: ['.svx', '.md'] })],
+
+	kit: {
+		adapter: adapter({ fallback: '404.html' }),
+		alias: {
+			'@': resolve(__dirname, 'src')
+		}
+	}
 };
+
+export default config;
